@@ -73,3 +73,6 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+/hex_grid_manager/Library
+/hex_grid_manager/Temp
+/hex_grid_manager/Assets/TextMesh Pro
