@@ -62,66 +62,86 @@ public class HexGridManager : MonoBehaviour
 
     // offset → cube coords
     private (int x,int y,int z) OffsetToCube(int col, int row)
+{
+    if (orientation == HexOrientation.FlatTop)
     {
-        if (orientation == HexOrientation.FlatTop)
+        // Flat-topped: use q-offset (columns control vertical shift)
+        if (columnOffset == ColumnOffset.OddQ)
         {
-            // odd-r flat-top
-            int x = col - ((row - (row & 1)) / 2);
-            int z = row;
+            // odd-q: odd columns shifted down
+            int x = col;
+            int z = row - ((col - (col & 1)) / 2);
             int y = -x - z;
             return (x, y, z);
         }
         else
         {
-            // pointy-top
-            if (columnOffset == ColumnOffset.OddQ)
-            {
-                // odd-q
-                int x = col;
-                int z = row - ((col - (col & 1)) / 2);
-                int y = -x - z;
-                return (x, y, z);
-            }
-            else
-            {
-                // even-q
-                int x = col;
-                int z = row - ((col + (col & 1)) / 2);
-                int y = -x - z;
-                return (x, y, z);
-            }
+            // even-q: even columns shifted down
+            int x = col;
+            int z = row - ((col + (col & 1)) / 2);
+            int y = -x - z;
+            return (x, y, z);
         }
     }
-
+    else
+    {
+        // Pointy-topped: q-offset (rows control horizontal shift)
+        if (columnOffset == ColumnOffset.OddQ)
+        {
+            // odd-q: odd columns right
+            int x = col;
+            int z = row - ((col - (col & 1)) / 2);
+            int y = -x - z;
+            return (x, y, z);
+        }
+        else
+        {
+            // even-q: even columns right
+            int x = col;
+            int z = row - ((col + (col & 1)) / 2);
+            int y = -x - z;
+            return (x, y, z);
+        }
+    }
+}
     // cube → offset coords
     private (int col,int row) CubeToOffset(int x, int y, int z)
+{
+    if (orientation == HexOrientation.FlatTop)
     {
-        if (orientation == HexOrientation.FlatTop)
+        // Flat-topped: reverse q-offset
+        if (columnOffset == ColumnOffset.OddQ)
         {
-            // odd-r flat-top
-            int col = x + ((z - (z & 1)) / 2);
-            int row = z;
+            // odd-q
+            int col = x;
+            int row = z + ((x - (x & 1)) / 2);
             return (col, row);
         }
         else
         {
-            // pointy-top
-            if (columnOffset == ColumnOffset.OddQ)
-            {
-                // odd-q
-                int col = x;
-                int row = z + ((x - (x & 1)) / 2);
-                return (col, row);
-            }
-            else
-            {
-                // even-q
-                int col = x;
-                int row = z + ((x + (x & 1)) / 2);
-                return (col, row);
-            }
+            // even-q
+            int col = x;
+            int row = z + ((x + (x & 1)) / 2);
+            return (col, row);
         }
     }
+    else
+    {
+        // Pointy-topped: reverse q-offset
+        if (columnOffset == ColumnOffset.OddQ)
+        {
+            int col = x;
+            int row = z + ((x - (x & 1)) / 2);
+            return (col, row);
+        }
+        else
+        {
+            int col = x;
+            int row = z + ((x + (x & 1)) / 2);
+            return (col, row);
+        }
+    }
+}
 
     #region Range Methods
     /// <summary>All tiles ≤ range away (excludes center).</summary>
