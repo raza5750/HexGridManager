@@ -30,5 +30,11 @@ public class GridDemoController : MonoBehaviour
     // UI Button callbacks:
     public void OnMoveMode()   => grid.HandleUnitMovement();
     public void OnAttackMode() => grid.StartAttackMode();
-    public void OnReset()      => grid.ClearGrid();
+    public void OnReset()      => OnRestartScene();
+
+    public void OnRestartScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
 }

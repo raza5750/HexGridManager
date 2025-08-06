@@ -76,3 +76,6 @@ crashlytics-build.properties
 /hex_grid_manager/Library
 /hex_grid_manager/Temp
 /hex_grid_manager/Assets/TextMesh Pro
+/hex_grid_manager/Recordings
+/hex_grid_manager/ProjectSettings
+/hex_grid_manager/UserSettings/Layouts

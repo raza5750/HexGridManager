@@ -62,86 +62,86 @@ public class HexGridManager : MonoBehaviour
 
     // offset → cube coords
     private (int x,int y,int z) OffsetToCube(int col, int row)
-{
-    if (orientation == HexOrientation.FlatTop)
     {
-        // Flat-topped: use q-offset (columns control vertical shift)
-        if (columnOffset == ColumnOffset.OddQ)
+        if (orientation == HexOrientation.FlatTop)
         {
-            // odd-q: odd columns shifted down
-            int x = col;
-            int z = row - ((col - (col & 1)) / 2);
-            int y = -x - z;
-            return (x, y, z);
+            // Flat-topped: use q-offset (columns control vertical shift)
+            if (columnOffset == ColumnOffset.OddQ)
+            {
+                // odd-q: odd columns shifted down
+                int x = col;
+                int z = row - ((col - (col & 1)) / 2);
+                int y = -x - z;
+                return (x, y, z);
+            }
+            else
+            {
+                // even-q: even columns shifted down
+                int x = col;
+                int z = row - ((col + (col & 1)) / 2);
+                int y = -x - z;
+                return (x, y, z);
+            }
         }
         else
         {
-            // even-q: even columns shifted down
-            int x = col;
-            int z = row - ((col + (col & 1)) / 2);
-            int y = -x - z;
-            return (x, y, z);
+            // Pointy-topped: q-offset (rows control horizontal shift)
+            if (columnOffset == ColumnOffset.OddQ)
+            {
+                // odd-q: odd columns right
+                int x = col;
+                int z = row - ((col - (col & 1)) / 2);
+                int y = -x - z;
+                return (x, y, z);
+            }
+            else
+            {
+                // even-q: even columns right
+                int x = col;
+                int z = row - ((col + (col & 1)) / 2);
+                int y = -x - z;
+                return (x, y, z);
+            }
         }
     }
-    else
-    {
-        // Pointy-topped: q-offset (rows control horizontal shift)
-        if (columnOffset == ColumnOffset.OddQ)
-        {
-            // odd-q: odd columns right
-            int x = col;
-            int z = row - ((col - (col & 1)) / 2);
-            int y = -x - z;
-            return (x, y, z);
-        }
-        else
-        {
-            // even-q: even columns right
-            int x = col;
-            int z = row - ((col + (col & 1)) / 2);
-            int y = -x - z;
-            return (x, y, z);
-        }
-    }
-}
     // cube → offset coords
     private (int col,int row) CubeToOffset(int x, int y, int z)
-{
-    if (orientation == HexOrientation.FlatTop)
     {
-        // Flat-topped: reverse q-offset
-        if (columnOffset == ColumnOffset.OddQ)
+        if (orientation == HexOrientation.FlatTop)
         {
-            // odd-q
-            int col = x;
-            int row = z + ((x - (x & 1)) / 2);
-            return (col, row);
+            // Flat-topped: reverse q-offset
+            if (columnOffset == ColumnOffset.OddQ)
+            {
+                // odd-q
+                int col = x;
+                int row = z + ((x - (x & 1)) / 2);
+                return (col, row);
+            }
+            else
+            {
+                // even-q
+                int col = x;
+                int row = z + ((x + (x & 1)) / 2);
+                return (col, row);
+            }
         }
         else
         {
-            // even-q
-            int col = x;
-            int row = z + ((x + (x & 1)) / 2);
-            return (col, row);
+            // Pointy-topped: reverse q-offset
+            if (columnOffset == ColumnOffset.OddQ)
+            {
+                int col = x;
+                int row = z + ((x - (x & 1)) / 2);
+                return (col, row);
+            }
+            else
+            {
+                int col = x;
+                int row = z + ((x + (x & 1)) / 2);
+                return (col, row);
+            }
         }
     }
-    else
-    {
-        // Pointy-topped: reverse q-offset
-        if (columnOffset == ColumnOffset.OddQ)
-        {
-            int col = x;
-            int row = z + ((x - (x & 1)) / 2);
-            return (col, row);
-        }
-        else
-        {
-            int col = x;
-            int row = z + ((x + (x & 1)) / 2);
-            return (col, row);
-        }
-    }
-}
 
     #region Range Methods
     /// <summary>All tiles ≤ range away (excludes center).</summary>
@@ -245,10 +245,12 @@ public class HexGridManager : MonoBehaviour
 
     public void HandleUnitMovement()
     {
+        Debug.Log("HandleUnitMovement called");
+        Debug.Log($"SelectedUnit: {SelectedUnit?.name}, IsMoving: {IsMoving}, CanSelectCell: {CanSelectCell}");
         if (SelectedUnit == null) return;
         ExitAttackMode();
         DehighlightAll();
-        foreach (var t in GetMovementRange(SelectedUnit.CurrentTile, SelectedUnit.RemainingMovement))
+        foreach (var t in GetMovementRange(SelectedUnit.CurrentTile, 3))
             t.MarkMovement();
         CanSelectCell = true;
     }
@@ -279,6 +281,10 @@ public class HexGridManager : MonoBehaviour
         }
         IsMoving = false;
         SelectedUnit.PlayIdleAnimation();
+
+        // Once we finish moving, disable cell selection so the user
+        // must click Move Mode again to highlight a new path.
+        CanSelectCell = false;
     }
 
     private IEnumerator MoveUnit(GridTile dest)
